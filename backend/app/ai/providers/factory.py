@@ -6,6 +6,7 @@ from flask import current_app, has_app_context
 
 from app.ai.providers.base import AIProvider
 from app.ai.providers.gemini import GeminiProvider
+from app.ai.providers.ollama import OllamaProvider
 from app.errors import AIProviderUnavailable
 
 
@@ -13,10 +14,11 @@ def get_ai_provider(
     config: Mapping[str, Any] | None = None,
 ) -> AIProvider:
     """
-    Return the configured AI provider.
+    Create the provider configured for SnapAction.
 
-    Pass a config mapping explicitly when using this function
-    outside a Flask application context.
+    Supported providers:
+    - ollama: local model inference
+    - gemini: optional remote model inference
     """
 
     if config is None:
@@ -29,8 +31,30 @@ def get_ai_provider(
         config = current_app.config
 
     provider_name = str(
-        config.get("AI_PROVIDER", "gemini")
+        config.get("AI_PROVIDER", "ollama")
     ).strip().lower()
+
+    if provider_name == "ollama":
+        return OllamaProvider(
+            base_url=str(
+                config.get(
+                    "OLLAMA_BASE_URL",
+                    "http://127.0.0.1:11434",
+                )
+            ),
+            model=str(
+                config.get(
+                    "OLLAMA_MODEL",
+                    "qwen3-vl:4b",
+                )
+            ),
+            timeout_seconds=float(
+                config.get(
+                    "OLLAMA_REQUEST_TIMEOUT_SECONDS",
+                    180.0,
+                )
+            ),
+        )
 
     if provider_name == "gemini":
         return GeminiProvider(
@@ -50,5 +74,5 @@ def get_ai_provider(
 
     raise AIProviderUnavailable(
         f"The configured AI provider '{provider_name}' "
-        "is not supported."
+        "is not supported. Choose 'ollama' or 'gemini'."
     )
