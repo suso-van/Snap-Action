@@ -131,6 +131,22 @@ class Config:
         "gemini-2.5-flash",
     ).strip()
 
+    # Supabase configuration
+    SUPABASE_URL = os.getenv(
+        "SUPABASE_URL",
+        "",
+    ).strip().rstrip("/")
+
+    SUPABASE_PUBLISHABLE_KEY = os.getenv(
+        "SUPABASE_PUBLISHABLE_KEY",
+        "",
+    ).strip()
+
+    SUPABASE_REQUEST_TIMEOUT_SECONDS = _get_int(
+        "SUPABASE_REQUEST_TIMEOUT_SECONDS",
+        10,
+    )
+
     # Frontend CORS
     CORS_ORIGINS = _get_csv(
         "CORS_ORIGINS",

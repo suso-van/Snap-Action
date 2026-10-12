@@ -34,3 +34,9 @@ Thumbs.db
 uploads/
 tmp/
 temp/
+
+# Local environment variables and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/.env.keys

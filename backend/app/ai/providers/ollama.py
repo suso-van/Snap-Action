@@ -27,7 +27,7 @@ class OllamaProvider(AIProvider):
     def __init__(
         self,
         base_url: str = "http://127.0.0.1:11434",
-        model: str = "qwen3-vl:4b",
+        model: str = "qwen3-vl:4b-instruct",
         timeout_seconds: float = 180.0,
     ) -> None:
         if not base_url.strip():
@@ -53,9 +53,7 @@ class OllamaProvider(AIProvider):
         system_instruction: str | None = None,
         response_format: ResponseFormat = "text/plain",
     ) -> AIResponse:
-        """
-        Generate a response using the local Ollama model.
-        """
+        """Generate a response using the local Ollama model."""
 
         if not prompt or not prompt.strip():
             raise AnalysisFailed(
@@ -82,9 +80,7 @@ class OllamaProvider(AIProvider):
                 )
 
             user_message["images"] = [
-                base64.b64encode(
-                    image_data
-                ).decode("ascii")
+                base64.b64encode(image_data).decode("ascii")
             ]
 
         messages.append(user_message)
@@ -93,20 +89,16 @@ class OllamaProvider(AIProvider):
             "model": self.model,
             "messages": messages,
             "stream": False,
-
-            # Request a normal final answer, not a separate
-            # reasoning/thinking response.
             "think": False,
-
             "options": {
-                "temperature": 0.2,
-                "num_predict": 2048,
+                "temperature": 0.1,
+                "num_ctx": 8192,
+                "num_predict": 4096,
             },
         }
 
         if response_format == "application/json":
             payload["format"] = "json"
-
         elif response_format != "text/plain":
             raise AnalysisFailed(
                 "The requested response format is unsupported."
@@ -122,7 +114,7 @@ class OllamaProvider(AIProvider):
         except httpx.TimeoutException:
             raise AIProviderUnavailable(
                 "The local AI request timed out. "
-                "Try again or use a smaller model."
+                "Check system resources or try a smaller model."
             ) from None
 
         except httpx.RequestError:
@@ -151,7 +143,7 @@ class OllamaProvider(AIProvider):
         if not response.is_success:
             raise AIProviderUnavailable(
                 "Ollama rejected the request. Check the "
-                "model, Ollama version, and request configuration."
+                "model, Ollama version, and configuration."
             )
 
         try:
@@ -161,7 +153,6 @@ class OllamaProvider(AIProvider):
                 "Ollama returned an invalid response."
             ) from None
 
-        # Handle API-level errors returned in the response.
         if result.get("error"):
             raise AIProviderUnavailable(
                 "Ollama reported a model inference error. "
@@ -169,10 +160,8 @@ class OllamaProvider(AIProvider):
             )
 
         message = result.get("message") or {}
-
         generated_text = message.get("content")
 
-        # Do not expose internal reasoning as the final answer.
         if (
             not isinstance(generated_text, str)
             or not generated_text.strip()
@@ -181,34 +170,29 @@ class OllamaProvider(AIProvider):
 
             if isinstance(thinking, str) and thinking.strip():
                 raise AnalysisFailed(
-                    "Ollama generated reasoning but no final answer. "
-                    "Check whether your Ollama version supports "
-                    "the think parameter."
-                )
-
-            done_reason = result.get("done_reason")
-
-            if done_reason == "length":
-                raise AnalysisFailed(
-                    "The model reached its generation limit "
-                    "before producing a final answer."
+                    "Ollama generated reasoning but no final "
+                    "answer. Check the model and think parameter."
                 )
 
             raise AnalysisFailed(
                 "Ollama returned an empty response. "
-                "Check the model and local Ollama version."
+                "Check the model and local Ollama logs."
             )
 
         usage: dict[str, Any] = {}
 
         prompt_tokens = result.get("prompt_eval_count")
         completion_tokens = result.get("eval_count")
+        done_reason = result.get("done_reason")
 
         if isinstance(prompt_tokens, int):
             usage["prompt_tokens"] = prompt_tokens
 
         if isinstance(completion_tokens, int):
             usage["completion_tokens"] = completion_tokens
+
+        if isinstance(done_reason, str):
+            usage["done_reason"] = done_reason
 
         return AIResponse(
             text=generated_text.strip(),
