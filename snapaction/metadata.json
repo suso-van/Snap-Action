@@ -1,0 +1,7 @@
+{
+  "name": "SnapAction",
+  "description": "AI-powered screenshot-to-action engine that extracts entities and instantly executes calendar events, payments, package tracking, navigation, and reminders.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

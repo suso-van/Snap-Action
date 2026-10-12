@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SnapAction</string>
+    <string name="title_activity_main">SnapAction</string>
+    <string name="package_name">com.snapaction.app</string>
+    <string name="custom_url_scheme">com.snapaction.app</string>
+</resources>
