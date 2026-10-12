@@ -39,3 +39,8 @@ and accept the debugging authorization prompt. With the development server runni
 3. Build and install the app: `bunx cap run android --target <device-serial>`
 
 The Capacitor Android project uses Java; no Kotlin source is needed.
+
+## Product and backend documentation
+
+- [Frontend feature guide](docs/FRONTEND_FEATURES.md)
+- [Backend API contract](docs/BACKEND_API.md)
