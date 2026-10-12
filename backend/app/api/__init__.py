@@ -1,25 +1,30 @@
 from __future__ import annotations
 
-from flask import Flask, Blueprint
-
-
-api_bp = Blueprint(
-    "api",
-    __name__,
-    url_prefix="/api",
-)
+from flask import Flask
 
 
 def register_api(app: Flask) -> None:
     """
-    Register all API route blueprints.
-
-    Additional blueprints will be registered here as the
-    analysis, assistant, resources, and action modules are built.
+    Register all SnapAction API blueprints.
     """
+
     from app.api.health import health_bp
+    from app.api.analysis import analysis_bp
 
-    api_bp.register_blueprint(health_bp)
+    app.register_blueprint(
+        health_bp,
+        url_prefix="/api",
+    )
 
-    # Register the API blueprint with the Flask application.
-    app.register_blueprint(api_bp)
+    app.register_blueprint(
+        analysis_bp,
+        url_prefix="/api",
+    )
+
+    # Register future modules here when implemented:
+    #
+    # from app.api.assistant import assistant_bp
+    # from app.api.resources import resources_bp
+    # from app.api.actions import actions_bp
+    # from app.api.reminders import reminders_bp
+    # from app.api.search import search_bp
