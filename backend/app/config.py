@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 
 
 # Load backend/.env for local development.
-# Production deployments should provide environment variables directly.
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_ROOT / ".env")
 
@@ -70,6 +69,7 @@ def _get_csv(name: str, default: str) -> list[str]:
 
 
 class Config:
+    # Application
     APP_NAME = os.getenv("APP_NAME", "SnapAction")
     APP_ENV = os.getenv("APP_ENV", "development")
 
@@ -81,6 +81,7 @@ class Config:
         "development-only-change-me",
     )
 
+    # Upload limits
     MAX_CONTENT_LENGTH_BYTES = _get_int(
         "MAX_CONTENT_LENGTH_BYTES",
         50 * 1024 * 1024,
@@ -91,16 +92,35 @@ class Config:
         12 * 1024 * 1024,
     )
 
+    # AI provider: use local Ollama by default
     AI_PROVIDER = os.getenv(
         "AI_PROVIDER",
-        "gemini",
+        "ollama",
     ).strip().lower()
 
     AI_REQUEST_TIMEOUT_SECONDS = _get_float(
         "AI_REQUEST_TIMEOUT_SECONDS",
-        45.0,
+        180.0,
     )
 
+    # Local Ollama configuration
+    OLLAMA_BASE_URL = os.getenv(
+        "OLLAMA_BASE_URL",
+        "http://127.0.0.1:11434",
+    ).strip().rstrip("/")
+
+    OLLAMA_MODEL = os.getenv(
+        "OLLAMA_MODEL",
+        "qwen3-vl:4b-instruct",
+    ).strip()
+
+    OLLAMA_REQUEST_TIMEOUT_SECONDS = _get_float(
+        "OLLAMA_REQUEST_TIMEOUT_SECONDS",
+        180.0,
+    )
+
+    # Optional Gemini configuration
+    # These values are ignored when AI_PROVIDER=ollama.
     GEMINI_API_KEY = os.getenv(
         "GEMINI_API_KEY",
         "",
@@ -111,11 +131,13 @@ class Config:
         "gemini-2.5-flash",
     ).strip()
 
+    # Frontend CORS
     CORS_ORIGINS = _get_csv(
         "CORS_ORIGINS",
         "http://localhost:5173,http://127.0.0.1:5173",
     )
 
+    # Logging
     LOG_LEVEL = os.getenv(
         "LOG_LEVEL",
         "INFO",

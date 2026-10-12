@@ -8,6 +8,31 @@ from app.schemas.analysis import (
     SuggestedAction,
 )
 
+from app.schemas.resources import (
+    ResourceCreate,
+    ResourceImage,
+    ResourceRecord,
+    ResourceUpdate,
+)
+
+from app.schemas.actions import (
+    ActionCreate,
+    ActionRecord,
+    ActionUpdate,
+)
+
+from app.schemas.reminders import (
+    ReminderCreate,
+    ReminderRecord,
+    ReminderUpdate,
+)
+
+from app.schemas.settings import (
+    SettingsPatch,
+    UserSettings,
+)
+
+
 __all__ = [
     "AnalysisRequest",
     "AnalysisResult",
@@ -16,4 +41,16 @@ __all__ = [
     "BoundingBoxLabel",
     "ExtractedEntity",
     "SuggestedAction",
+    "ResourceCreate",
+    "ResourceImage",
+    "ResourceRecord",
+    "ResourceUpdate",
+    "ActionCreate",
+    "ActionRecord",
+    "ActionUpdate",
+    "ReminderCreate",
+    "ReminderRecord",
+    "ReminderUpdate",
+    "SettingsPatch",
+    "UserSettings",
 ]

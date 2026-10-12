@@ -5,11 +5,12 @@ from flask import Flask
 
 def register_api(app: Flask) -> None:
     """
-    Register all SnapAction API blueprints.
+    Register all implemented SnapAction API blueprints.
     """
 
     from app.api.health import health_bp
     from app.api.analysis import analysis_bp
+    from app.api.assistant import assistant_bp
 
     app.register_blueprint(
         health_bp,
@@ -21,10 +22,7 @@ def register_api(app: Flask) -> None:
         url_prefix="/api",
     )
 
-    # Register future modules here when implemented:
-    #
-    # from app.api.assistant import assistant_bp
-    # from app.api.resources import resources_bp
-    # from app.api.actions import actions_bp
-    # from app.api.reminders import reminders_bp
-    # from app.api.search import search_bp
+    app.register_blueprint(
+        assistant_bp,
+        url_prefix="/api",
+    )

@@ -329,8 +329,6 @@ class AskScreenshotRequest(APIModel):
             )
 
         return value
-
-
 class AskScreenshotResponse(APIModel):
     answer: str = Field(
         min_length=1,
